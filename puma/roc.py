@@ -125,7 +125,7 @@ class Roc(PlotLineObject):
             ratio = np.ones(len(self.sig_eff))
             if self.n_test is None:
                 return self.sig_eff, ratio, None
-            ratio_err = self.binomial_error(norm=True) * ratio
+            ratio_err = self.binomial_error(norm=True) * ratio[self.non_zero_mask]
             return self.sig_eff, ratio, ratio_err
 
         # get overlapping sig_eff interval of the two roc curves
@@ -597,12 +597,8 @@ class RocPlot(PlotBase):
             if elem.n_test is not None:
                 # if uncertainties are available for roc plotting their uncertainty as
                 # a band around the roc itself
-                rej_band_down = (
-                    elem.bkg_rej[elem.non_zero_mask] - elem.binomial_error()[elem.non_zero_mask]
-                )
-                rej_band_up = (
-                    elem.bkg_rej[elem.non_zero_mask] + elem.binomial_error()[elem.non_zero_mask]
-                )
+                rej_band_down = elem.bkg_rej[elem.non_zero_mask] - elem.binomial_error()
+                rej_band_up = elem.bkg_rej[elem.non_zero_mask] + elem.binomial_error()
                 self.axis_top.fill_between(
                     elem.sig_eff[elem.non_zero_mask],
                     rej_band_down,
